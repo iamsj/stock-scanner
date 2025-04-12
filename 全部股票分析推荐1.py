@@ -18,6 +18,7 @@ import pandas as pd
 import akshare as ak
 from tqdm import tqdm
 
+
 # -------------------------------
 # **技术指标配置**
 # -------------------------------
@@ -42,6 +43,7 @@ class TechnicalParams:
             volume_ma_period=20,
             atr_period=14
         )
+
 
 # -------------------------------
 # **股票分析引擎**
@@ -156,7 +158,8 @@ class StockAnalyzer:
         return macd, signal, macd - signal
 
     @staticmethod
-    def calculate_bollinger_bands(series: pd.Series, period: int, std_dev: int) -> Tuple[pd.Series, pd.Series, pd.Series]:
+    def calculate_bollinger_bands(series: pd.Series, period: int, std_dev: int) -> Tuple[
+        pd.Series, pd.Series, pd.Series]:
         """计算 Bollinger 通道"""
         middle = series.rolling(window=period, min_periods=period).mean()
         std = series.rolling(window=period, min_periods=period).std()
@@ -318,6 +321,7 @@ class StockAnalyzer:
             self.logger.error(f"分析股票 {stock_code} 失败：{str(e)}")
             raise
 
+
 # -------------------------------
 # **全盘股票扫描器**
 # -------------------------------
@@ -349,9 +353,13 @@ class TopStockScanner:
             candidate_cols = ['A股代码', '证券代码', '股票代码', 'code']
 
             def get_codes(df: pd.DataFrame) -> set:
+                # 遍历候选列
                 for col in candidate_cols:
+                    # 如果候选列在数据框的列中
                     if col in df.columns:
+                        # 返回候选列中股票代码的集合
                         return {str(code).zfill(6) for code in df[col]}
+                # 如果没有找到股票代码字段，抛出KeyError异常
                 raise KeyError(f"未能找到股票代码字段，现有字段：{df.columns.tolist()}")
 
             sh_codes = get_codes(sh_df)
@@ -379,7 +387,7 @@ class TopStockScanner:
                 if attempt == max_retries - 1:
                     self.logger.error(f"股票 {stock_code} 分析尝试 {max_retries} 次后失败：{str(e)}")
                     return None
-                self.logger.warning(f"股票 {stock_code} 第 {attempt+1} 次分析失败：{str(e)}")
+                self.logger.warning(f"股票 {stock_code} 第 {attempt + 1} 次分析失败：{str(e)}")
                 time.sleep(random.uniform(2, 5))
 
     def process_batch(self, stock_codes: List[str]) -> List[Dict]:
@@ -445,7 +453,8 @@ class TopStockScanner:
 
             if results:
                 df_results = pd.DataFrame(results)
-                high_score_stocks = df_results[df_results['score'] >= self.min_score].sort_values('score', ascending=False)
+                high_score_stocks = df_results[df_results['score'] >= self.min_score].sort_values('score',
+                                                                                                  ascending=False)
                 formatted_results = []
                 for _, row in high_score_stocks.iterrows():
                     formatted_results.append({
@@ -466,13 +475,15 @@ class TopStockScanner:
             self.logger.error(f"全盘扫描失败：{str(e)}")
             raise
 
+
 # -------------------------------
 # **结果分组与报告生成**
 # -------------------------------
 def format_price_category(price: float) -> str:
     """将价格划分为区间（例如 32.5 -> '30-40'）"""
     base = (price // 10) * 10
-    return f"{int(base)}-{int(base+10)}"
+    return f"{int(base)}-{int(base + 10)}"
+
 
 def save_results_by_price(results: List[Dict]) -> None:
     """按价格区间保存分析结果至文件"""
@@ -519,6 +530,7 @@ def save_results_by_price(results: List[Dict]) -> None:
         logging.error(f"保存结果时发生错误: {str(e)}")
         raise
 
+
 def create_summary_file(price_groups: Dict[str, List[Dict]]) -> None:
     """生成综合汇总报告"""
     try:
@@ -551,6 +563,7 @@ def create_summary_file(price_groups: Dict[str, List[Dict]]) -> None:
     except Exception as e:
         logging.error(f"生成汇总报告失败：{str(e)}")
         raise
+
 
 # -------------------------------
 # **主程序入口**
@@ -597,6 +610,7 @@ def main():
             f.write(f"详细堆栈信息:\n{traceback.format_exc()}")
         print("错误日志已保存至 scanner/error_log.txt")
         input("\n按Enter键退出……")
+
 
 if __name__ == "__main__":
     main()

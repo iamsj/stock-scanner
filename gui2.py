@@ -1,15 +1,17 @@
 import sys
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                           QHBoxLayout, QLineEdit, QPushButton, QTextBrowser,
-                           QLabel, QTextEdit, QMessageBox, QProgressBar, 
-                           QFrame, QSizePolicy)
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
+                             QHBoxLayout, QLineEdit, QPushButton, QTextBrowser,
+                             QLabel, QTextEdit, QMessageBox, QProgressBar,
+                             QFrame, QSizePolicy)
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont, QPalette, QColor
 import markdown2
 from stock_analyzer import StockAnalyzer
 
+
 class ModernFrame(QFrame):
     """现代化的面板组件"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFrameStyle(QFrame.Shape.StyledPanel | QFrame.Shadow.Raised)
@@ -21,8 +23,10 @@ class ModernFrame(QFrame):
             }
         """)
 
+
 class ModernButton(QPushButton):
     """现代化的按钮组件"""
+
     def __init__(self, text, parent=None, primary=True):
         super().__init__(text, parent)
         self.setMinimumHeight(40)
@@ -69,8 +73,10 @@ class ModernButton(QPushButton):
                 }
             """)
 
+
 class ModernLineEdit(QLineEdit):
     """现代化的输入框组件"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumHeight(40)
@@ -90,8 +96,10 @@ class ModernLineEdit(QLineEdit):
             }
         """)
 
+
 class ModernTextEdit(QTextEdit):
     """现代化的多行文本输入框组件"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("""
@@ -110,8 +118,10 @@ class ModernTextEdit(QTextEdit):
             }
         """)
 
+
 class ModernProgressBar(QProgressBar):
     """现代化的进度条组件"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("""
@@ -128,6 +138,7 @@ class ModernProgressBar(QProgressBar):
             }
         """)
         self.setTextVisible(False)
+
 
 class AnalysisWorker(QThread):
     """后台工作线程，用于执行分析任务"""
@@ -146,6 +157,7 @@ class AnalysisWorker(QThread):
             self.finished.emit(report)
         except Exception as e:
             self.error.emit(str(e))
+
 
 class BatchAnalysisWorker(QThread):
     """后台工作线程，用于执行批量分析任务"""
@@ -170,6 +182,7 @@ class BatchAnalysisWorker(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
+
 class ModernStockAnalyzerGUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -186,7 +199,7 @@ class ModernStockAnalyzerGUI(QMainWindow):
             width = int(geometry.width() * 0.75)
             height = int(geometry.height() * 0.75)
             self.resize(width, height)
-            
+
             # 居中显示
             center = geometry.center()
             frame = self.frameGeometry()
@@ -382,7 +395,7 @@ class ModernStockAnalyzerGUI(QMainWindow):
             return
 
         stock_list = [code.strip() for code in text.split('\n') if code.strip()]
-        
+
         self.batch_analyze_btn.setEnabled(False)
         self.progress_bar.setVisible(True)
         self.progress_bar.setValue(0)
@@ -406,12 +419,12 @@ class ModernStockAnalyzerGUI(QMainWindow):
         markdown_text = "# 批量股票分析报告\n\n"
         for rec in recommendations:
             markdown_text += self.format_report(rec, False)
-            
+
         html_content = markdown2.markdown(markdown_text, extras=['tables', 'fenced-code-blocks'])
         self.result_browser.setHtml(html_content)
         self.batch_analyze_btn.setEnabled(True)
         self.progress_bar.setVisible(False)
-        
+
     def handle_analysis_error(self, error_message):
         """处理分析错误"""
         self.show_error(f'分析过程中出现错误：{error_message}')
@@ -483,15 +496,17 @@ class ModernStockAnalyzerGUI(QMainWindow):
         """)
         error.exec()
 
+
 def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
-    
+
     # 创建并显示主窗口
     window = ModernStockAnalyzerGUI()
     window.show()
-    
+
     sys.exit(app.exec())
+
 
 if __name__ == '__main__':
     main()
